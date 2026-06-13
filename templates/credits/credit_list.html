@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Créditos</h1>
+
+    <!-- Filtros -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label>Cliente</label>
+            <select name="client" class="form-select">
+                <option value="">Todos</option>
+                {% for client in clients %}
+                <option value="{{ client.id }}" {% if request.GET.client == client.id|stringformat:"s" %}selected{% endif %}>
+                    {{ client.full_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label>Estado</label>
+            <select name="status" class="form-select">
+                <option value="">Todos</option>
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="{% url 'credits:credit_list' %}" class="btn btn-secondary ms-2">Limpiar</a>
+        </div>
+    </form>
+
+    {% if is_analyst %}
+    <a href="{% url 'credits:credit_create' %}" class="btn btn-primary mb-3">Nuevo crédito</a>
+    {% endif %}
+
+    <table class="table table-bordered">
+        <thead>
+            <tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Plazo (meses)</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for credit in credits %}
+            <tr>
+                <td>{{ credit.id }}</td>
+                <td>{{ credit.client.full_name }}</td>
+                <td>${{ credit.amount }}</td>
+                <td>{{ credit.term_months }}</td>
+                <td>{{ credit.get_status_display }}</td>
+                <td>
+                    <a href="{% url 'credits:credit_detail' credit.id %}" class="btn btn-sm btn-info">Ver</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No hay créditos registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% include "pagination.html" with page_obj=page_obj %}
+</div>
+{% endblock %}

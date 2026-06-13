@@ -1,5 +1,8 @@
-vevn/
-*.pyc
-db.sqlite3
+venv/
 .env
+db.sqlite3
 __pycache__/
+*.pyc
+staticfiles/
+media/
+*.log

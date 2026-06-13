@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Registrar pago de cuota</h2>
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <strong>Crédito #{{ credit.id }} - Cliente: {{ credit.client.full_name }}</strong>
+        </div>
+        <div class="card-body">
+            <p><strong>Cuota número:</strong> {{ installment.installment_number }}</p>
+            <p><strong>Fecha de vencimiento:</strong> {{ installment.due_date }}</p>
+            <p><strong>Valor de la cuota:</strong> ${{ installment.installment_value }}</p>
+            <hr>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.amortization_schedule }}
+                <div class="mb-3">
+                    <label class="form-label">Monto a pagar</label>
+                    {{ form.amount_paid|add_class:"form-control" }}
+                    <div class="form-text">El monto debe ser igual al valor de la cuota.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Referencia (opcional)</label>
+                    {{ form.reference_number|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Notas</label>
+                    {{ form.notes|add_class:"form-control" }}
+                </div>
+                <button type="submit" class="btn btn-success">Confirmar pago</button>
+                <a href="{% url 'credits:credit_detail' credit.id %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
