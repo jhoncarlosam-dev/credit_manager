@@ -36,9 +36,9 @@ class Credit(models.Model):
         if not is_new:
            old_status = Credit.objects.get(pk=self.pk).status
         super().save(*args, **kwargs)
-        # Generar cuotas solo si el crédito es nuevo y se crea como APPROVED,
-        # O si se actualiza de PENDING a APPROVED y aún no tiene cuotas
-        if (is_new and self.status == self.Status.APPROVED) or (old_status == self.Status.PENDING and self.status == self.Status.APPROVED):
+        # Generar cuotas solo si el crédito es nuevo y se crea como ACTIVE,
+        # O si se actualiza de PENDING a ACTIVE y aún no tiene cuotas
+        if (is_new and self.status == self.Status.ACTIVE) or (old_status == self.Status.PENDING and self.status == self.Status.ACTIVE):
             if not self.installments.exists():
               self.generate_amortization_schedule()
 

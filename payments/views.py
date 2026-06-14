@@ -1,4 +1,4 @@
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
@@ -10,6 +10,15 @@ from credits.models import AmortizationSchedule, Credit
 class AnalystRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.groups.filter(name='analyst').exists() or self.request.user.is_superuser
+
+class PaymentListView(LoginRequiredMixin, ListView):
+    model = Payment
+    template_name = 'payments/payment_list.html'
+    context_object_name = 'payments'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Payment.objects.select_related('amortization_schedule__credit__client').all()
 
 class PaymentCreateView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
     model = Payment

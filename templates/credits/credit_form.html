@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
+{% block title %}Solicitar crédito - Credit Manager{% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h1>Solicitar crédito</h1>
+    <h1 class="mb-4">
+        <i class="bi bi-plus-circle"></i> Solicitar crédito
+    </h1>
+
     <form method="post">
         {% csrf_token %}
+
         {% for field in form %}
         <div class="mb-3">
-            <label>{{ field.label }}</label>
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
             {{ field|add_class:"form-control" }}
             {% if field.help_text %}
             <small class="form-text text-muted">{{ field.help_text }}</small>
@@ -17,8 +22,58 @@
             {% endfor %}
         </div>
         {% endfor %}
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <a href="{% url 'credits:credit_list' %}" class="btn btn-secondary">Cancelar</a>
+
+        <!-- Calculated monthly payment -->
+        <div class="card bg-light mb-4">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-calculator"></i> Cuota mensual estimada
+                </h5>
+                <p class="card-text display-6" id="monthlyPayment">$0.00</p>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Guardar
+        </button>
+        <a href="{% url 'credits:credit_list' %}" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancelar
+        </a>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.querySelector('[name="amount"]');
+    const termInput = document.querySelector('[name="term_months"]');
+    const rateInput = document.querySelector('[name="annual_interest_rate"]');
+    const monthlyPaymentDisplay = document.getElementById('monthlyPayment');
+
+    function calculateMonthlyPayment() {
+        const P = parseFloat(amountInput.value) || 0;
+        const annualRate = parseFloat(rateInput.value) || 0;
+        const n = parseInt(termInput.value) || 0;
+        const r = (annualRate / 100) / 12; // monthly rate
+
+        let monthlyPayment;
+
+        if (r === 0) {
+            monthlyPayment = n > 0 ? P / n : 0;
+        } else if (n > 0) {
+            monthlyPayment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        } else {
+            monthlyPayment = 0;
+        }
+
+        monthlyPaymentDisplay.textContent = '$' + monthlyPayment.toFixed(2);
+    }
+
+    amountInput.addEventListener('input', calculateMonthlyPayment);
+    termInput.addEventListener('input', calculateMonthlyPayment);
+    rateInput.addEventListener('input', calculateMonthlyPayment);
+
+    // Initial calculation
+    calculateMonthlyPayment();
+});
+</script>
 {% endblock %}

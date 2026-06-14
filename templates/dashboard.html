@@ -1,12 +1,15 @@
 {% extends "base.html" %}
+{% block title %}Dashboard - Credit Manager{% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Dashboard</h1>
+    <h1 class="mb-4">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </h1>
     <div class="row">
         <div class="col-md-3">
             <div class="card text-white bg-primary mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Créditos activos</h5>
+                    <h5 class="card-title"><i class="bi bi-activity"></i> Créditos activos</h5>
                     <p class="card-text display-4">{{ total_active_credits }}</p>
                 </div>
             </div>
@@ -14,7 +17,7 @@
         <div class="col-md-3">
             <div class="card text-white bg-success mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Total prestado</h5>
+                    <h5 class="card-title"><i class="bi bi-cash"></i> Total prestado</h5>
                     <p class="card-text display-4">${{ total_loaned|floatformat:0 }}</p>
                 </div>
             </div>
@@ -22,7 +25,7 @@
         <div class="col-md-3">
             <div class="card text-white bg-info mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Clientes</h5>
+                    <h5 class="card-title"><i class="bi bi-people"></i> Clientes</h5>
                     <p class="card-text display-4">{{ total_clients }}</p>
                 </div>
             </div>
@@ -30,7 +33,7 @@
         <div class="col-md-3">
             <div class="card text-white bg-warning mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Cuotas vencidas</h5>
+                    <h5 class="card-title"><i class="bi bi-exclamation-triangle"></i> Cuotas vencidas</h5>
                     <p class="card-text display-4">{{ overdue_count }}</p>
                     <small>Total: ${{ overdue_total|floatformat:2 }}</small>
                 </div>
@@ -40,29 +43,50 @@
 
     <div class="card mt-4">
         <div class="card-header">
-            <h4>Cuotas vencidas (pendientes de pago)</h4>
+            <h4 class="mb-0"><i class="bi bi-clock-history"></i> Cuotas vencidas (pendientes de pago)</h4>
         </div>
         <div class="card-body">
             {% if overdue_installments %}
-            <table class="table table-sm">
-                <thead>
-                    <tr><th>Cliente</th><th>Crédito ID</th><th>Cuota N°</th><th>Vencimiento</th><th>Valor</th><th>Acción</th></tr>
-                </thead>
-                <tbody>
-                    {% for inst in overdue_installments %}
-                    <tr>
-                        <td>{{ inst.credit.client.full_name }}</td>
-                        <td>{{ inst.credit.id }}</td>
-                        <td>{{ inst.installment_number }}</td>
-                        <td>{{ inst.due_date }}</td>
-                        <td>${{ inst.installment_value }}</td>
-                        <td><a href="{% url 'payments:payment_create' inst.id %}" class="btn btn-sm btn-primary">Pagar</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Crédito ID</th>
+                            <th>Cuota N°</th>
+                            <th>Vencimiento</th>
+                            <th>Valor</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inst in overdue_installments %}
+                        <tr class="table-danger">
+                            <td>{{ inst.credit.client.full_name }}</td>
+                            <td>{{ inst.credit.id }}</td>
+                            <td>{{ inst.installment_number }}</td>
+                            <td>{{ inst.due_date|date:"d/m/Y" }}</td>
+                            <td>${{ inst.installment_value }}</td>
+                            <td>
+                                {% if is_analyst %}
+                                <a href="{% url 'payments:payment_create' inst.id %}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-credit-card"></i> Pagar
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'credits:credit_detail' inst.credit.id %}" class="btn btn-sm btn-info">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             {% else %}
-            <p>No hay cuotas vencidas.</p>
+            <div class="text-center py-5">
+                <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                <h4 class="mt-2">No hay cuotas vencidas</h4>
+            </div>
             {% endif %}
         </div>
     </div>

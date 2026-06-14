@@ -1,35 +1,65 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
+{% block title %}Registrar pago - Credit Manager{% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h2>Registrar pago de cuota</h2>
-    <div class="card">
+    <h2 class="mb-4">
+        <i class="bi bi-credit-card"></i> Registrar pago de cuota
+    </h2>
+
+    <div class="card mb-4">
         <div class="card-header bg-info text-white">
-            <strong>Crédito #{{ credit.id }} - Cliente: {{ credit.client.full_name }}</strong>
+            <h5 class="mb-0">
+                <i class="bi bi-info-circle"></i> Crédito #{{ credit.id }} - Cliente: {{ credit.client.full_name }}
+            </h5>
         </div>
         <div class="card-body">
-            <p><strong>Cuota número:</strong> {{ installment.installment_number }}</p>
-            <p><strong>Fecha de vencimiento:</strong> {{ installment.due_date }}</p>
-            <p><strong>Valor de la cuota:</strong> ${{ installment.installment_value }}</p>
-            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-2">
+                        <strong><i class="bi bi-123"></i> Cuota número:</strong> {{ installment.installment_number }}
+                    </p>
+                    <p class="mb-2">
+                        <strong><i class="bi bi-calendar"></i> Fecha de vencimiento:</strong> {{ installment.due_date|date:"d/m/Y" }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-2">
+                        <strong><i class="bi bi-cash"></i> Valor de la cuota:</strong> ${{ installment.installment_value }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
             <form method="post">
                 {% csrf_token %}
                 {{ form.amortization_schedule }}
+
                 <div class="mb-3">
-                    <label class="form-label">Monto a pagar</label>
+                    <label for="{{ form.amount_paid.id_for_label }}" class="form-label">Monto a pagar</label>
                     {{ form.amount_paid|add_class:"form-control" }}
-                    <div class="form-text">El monto debe ser igual al valor de la cuota.</div>
+                    <div class="form-text text-muted">El monto debe ser igual al valor de la cuota.</div>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">Referencia (opcional)</label>
-                    {{ form.reference_number|add_class:"form-control" }}
+                    <label for="{{ form.reference_number.id_for_label }}" class="form-label">Referencia (opcional)</label>
+                    {{ form.reference_number|add_class:"form-control"|attr:"placeholder:Número de referencia" }}
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">Notas</label>
-                    {{ form.notes|add_class:"form-control" }}
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notas</label>
+                    {{ form.notes|add_class:"form-control"|attr:"rows:3"|attr:"placeholder:Notas adicionales sobre el pago" }}
                 </div>
-                <button type="submit" class="btn btn-success">Confirmar pago</button>
-                <a href="{% url 'credits:credit_detail' credit.id %}" class="btn btn-secondary">Cancelar</a>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Confirmar pago
+                </button>
+                <a href="{% url 'credits:credit_detail' credit.id %}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </a>
             </form>
         </div>
     </div>

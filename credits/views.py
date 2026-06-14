@@ -57,7 +57,7 @@ class CreditCreateView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
         messages.success(self.request, 'Solicitud de crédito creada exitosamente.')
         return super().form_valid(form)
 
-# Aprobar crédito (solo analistas) -> cambia estado a APPROVED y genera cuotas
+# Aprobar crédito (solo analistas) -> cambia estado a ACTIVE y genera cuotas
 class CreditApproveView(LoginRequiredMixin, AnalystRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         return reverse('credits:credit_detail', kwargs={'pk': self.kwargs['pk']})
@@ -65,8 +65,8 @@ class CreditApproveView(LoginRequiredMixin, AnalystRequiredMixin, RedirectView):
     def get(self, request, *args, **kwargs):
         credit = get_object_or_404(Credit, pk=self.kwargs['pk'])
         if credit.status == Credit.Status.PENDING:
-            credit.status = Credit.Status.APPROVED
-            credit.save()  # El método save() genera las cuotas si es APPROVED
+            credit.status = Credit.Status.ACTIVE
+            credit.save()  # El método save() genera las cuotas si es ACTIVE
             messages.success(request, 'Crédito aprobado. Se generó la tabla de amortización.')
         else:
             messages.warning(request, 'Este crédito no puede ser aprobado.')

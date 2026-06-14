@@ -16,6 +16,10 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.get_role_display()}"
+    
+    @property
+    def is_analyst(self):
+        return self.role == self.Role.ANALYST
 
 # Señal para crear/guardar el perfil automáticamente cuando se crea un User
 @receiver(post_save, sender=User)
@@ -24,7 +28,3 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
     else:
         instance.profile.save()
-
-@property
-def is_analyst(self):
-    return self.role == self.Role.ANALYST
